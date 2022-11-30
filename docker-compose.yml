@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  psql:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: transaction_db
+      POSTGRES_PASSWORD: 26538hsvgn8p
+  #    ports:
+  #      - "3232:5432"
+
+  app:
+    build: .
+    restart: always
+    depends_on:
+      - psql

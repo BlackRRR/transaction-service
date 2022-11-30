@@ -1,0 +1,10 @@
+config:
+  service_port: "8000"
+
+  db_conn_config:
+    user: "blackr"
+    password: ""
+    host: "localhost"
+    port: "5432"
+    db_name: "transaction_db"
+    pool_max_conns: "10"
