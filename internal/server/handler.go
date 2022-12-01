@@ -4,6 +4,7 @@ import (
 	"github.com/BlackRRR/transaction-service/internal/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 	"sync"
 )
 
@@ -11,13 +12,17 @@ func (c *Controller) GetMoney(gc *gin.Context) {
 	var req model.TransactionReq
 	//get request
 	if err := gc.BindJSON(&req); err != nil {
-		model.NewLinksError(gc, http.StatusBadRequest, "invalid req body")
+		NewLinksError(gc, http.StatusBadRequest, "invalid req body")
 		return
 	}
 
 	transactionID, err := c.transaction.StartTransaction(gc, req)
 	if err != nil {
-		model.NewLinksError(gc, http.StatusInternalServerError, "CANCEL TRANSACTION, INTERNAL SERVER ERROR")
+		if strings.Contains(err.Error(), "client does not exist") {
+			NewLinksError(gc, http.StatusInternalServerError, "CLIENT DOES NOT EXISTS")
+			return
+		}
+		NewLinksError(gc, http.StatusInternalServerError, "CANCEL TRANSACTION, INTERNAL SERVER ERROR")
 		return
 	}
 
@@ -54,7 +59,7 @@ func (c *Controller) GetMoney(gc *gin.Context) {
 
 	wg.Wait()
 	if resp.Error != "" {
-		model.NewLinksError(gc, http.StatusInternalServerError, resp.Error)
+		NewLinksError(gc, http.StatusInternalServerError, resp.Error)
 		return
 	}
 
@@ -66,14 +71,14 @@ func (c *Controller) StatusTransaction(gc *gin.Context) {
 
 	//get request
 	if err := gc.BindJSON(&req); err != nil {
-		model.NewLinksError(gc, http.StatusBadRequest, "invalid req body")
+		NewLinksError(gc, http.StatusBadRequest, "invalid req body")
 		return
 	}
 
 	//get all transactions info
 	answer, err := c.transaction.GetAllTransactions(gc, req)
 	if err != nil {
-		model.NewLinksError(gc, http.StatusInternalServerError, "CANCEL REQUEST, INTERNAL SERVER ERROR")
+		NewLinksError(gc, http.StatusInternalServerError, "CANCEL REQUEST, INTERNAL SERVER ERROR")
 		return
 	}
 
@@ -82,4 +87,8 @@ func (c *Controller) StatusTransaction(gc *gin.Context) {
 	}
 
 	gc.JSON(http.StatusOK, answer)
+}
+
+func NewLinksError(c *gin.Context, statusCode int, message string) {
+	c.AbortWithStatusJSON(statusCode, model.ErrorResponse{ErrorMessage: message})
 }
