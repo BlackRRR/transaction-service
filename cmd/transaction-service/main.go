@@ -38,6 +38,11 @@ func main() {
 	reader := services.NewReader(logger, repo)
 	reader.ReadQueue()
 
+	err = reader.RecoveryUncompletedTransactions()
+	if err != nil {
+		logger.Sugar().Infof("failed to recover transactions %s", err.Error())
+	}
+
 	//init new controller
 	controller := server.NewController(reader)
 

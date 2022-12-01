@@ -18,42 +18,42 @@ func Test_transaction(t *testing.T) {
 	var AllReqs []TestRequest
 
 	req1 := TestRequest{
-		ClientID: 12412512512,
+		ClientID: 1215125125,
 		Amount:   300,
 	}
 
 	req2 := TestRequest{
-		ClientID: 41251251251,
+		ClientID: 2412412412,
 		Amount:   6636,
 	}
 
 	req3 := TestRequest{
-		ClientID: 42352304304,
+		ClientID: 4444444444,
 		Amount:   555,
 	}
 
 	req4 := TestRequest{
-		ClientID: 12412512512,
+		ClientID: 1215125125,
 		Amount:   15000,
 	}
 
 	req5 := TestRequest{
-		ClientID: 41251251251,
+		ClientID: 2412412412,
 		Amount:   25000,
 	}
 
 	req6 := TestRequest{
-		ClientID: 42352304304,
+		ClientID: 4444444444,
 		Amount:   35000,
 	}
 
 	req7 := TestRequest{
-		ClientID: 42352304304,
+		ClientID: 4444444444,
 		Amount:   100000,
 	}
 
 	req8 := TestRequest{
-		ClientID: 42352304304,
+		ClientID: 4444444444,
 		Amount:   1000000000000,
 	}
 	AllReqs = append(AllReqs, req1, req2, req3, req4, req5, req6, req7, req8)
@@ -67,7 +67,7 @@ func Test_transaction(t *testing.T) {
 		client := http.Client{}
 
 		body := bytes.NewReader(reqBody)
-		request, err := http.NewRequest("GET", "http://localhost:8000/create-transaction/get-money", body)
+		request, err := http.NewRequest("GET", "http://localhost:8080/create-transaction/get-money", body)
 		if err != nil {
 			t.Errorf("failed to create request %s", err.Error())
 		}

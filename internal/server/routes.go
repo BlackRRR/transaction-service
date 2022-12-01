@@ -7,12 +7,12 @@ import (
 )
 
 type Controller struct {
-	transaction *services.Reader
+	transaction *services.TransactionService
 	queue       *model.Queue
 	response    *model.Writer
 }
 
-func NewController(service *services.Reader) *Controller {
+func NewController(service *services.TransactionService) *Controller {
 	return &Controller{
 		transaction: service,
 		queue:       service.ReadQ,
@@ -24,8 +24,9 @@ func NewController(service *services.Reader) *Controller {
 func (c *Controller) InitRoutes() *gin.Engine {
 	g := gin.New()
 
-	//pen for get money
+	//route for get money
 	g.GET("/create-transaction/get-money", c.GetMoney)
+	g.GET("/transaction-status", c.StatusTransaction)
 
 	return g
 }

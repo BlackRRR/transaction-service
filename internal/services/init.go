@@ -6,18 +6,18 @@ import (
 	"go.uber.org/zap"
 )
 
-type Reader struct {
+type TransactionService struct {
 	logger *zap.Logger
 	repo   repository.Implementation
 	ReadQ  *model.Queue
 	Resp   *model.Writer
 }
 
-func NewReader(logger *zap.Logger, impl repository.Implementation) *Reader {
-	return &Reader{
+func NewReader(logger *zap.Logger, impl repository.Implementation) *TransactionService {
+	return &TransactionService{
 		logger: logger,
 		repo:   impl,
-		ReadQ:  &model.Queue{UserQ: make(map[int64]chan model.Request)},
+		ReadQ:  &model.Queue{UserQ: make(map[int64]chan model.TransactionReq)},
 		Resp:   &model.Writer{RespQ: make(chan *model.Response)},
 	}
 }

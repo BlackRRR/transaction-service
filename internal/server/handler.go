@@ -8,31 +8,33 @@ import (
 )
 
 func (c *Controller) GetMoney(gc *gin.Context) {
-	var req model.Request
-
+	var req model.TransactionReq
 	//get request
 	if err := gc.BindJSON(&req); err != nil {
 		model.NewLinksError(gc, http.StatusBadRequest, "invalid req body")
 		return
 	}
 
-	//start transaction
 	transactionID, err := c.transaction.StartTransaction(gc, req)
 	if err != nil {
-		model.NewLinksError(gc, http.StatusInternalServerError, err.Error())
+		model.NewLinksError(gc, http.StatusInternalServerError, "CANCEL TRANSACTION, INTERNAL SERVER ERROR")
 		return
 	}
 
-	req.TransactionID = transactionID
+	tr := model.TransactionReq{
+		TransactionID: transactionID,
+		ClientID:      req.ClientID,
+		Amount:        req.Amount,
+	}
 
 	//check if request exitst for this user
 	_, exist := c.queue.UserQ[req.ClientID]
 	if !exist {
-		c.queue.UserQ[req.ClientID] = make(chan model.Request)
+		c.queue.UserQ[req.ClientID] = make(chan model.TransactionReq)
 	}
 
 	//send request to channel
-	c.queue.UserQ[req.ClientID] <- req
+	c.queue.UserQ[req.ClientID] <- tr
 
 	var resp *model.Response
 
@@ -57,4 +59,27 @@ func (c *Controller) GetMoney(gc *gin.Context) {
 	}
 
 	gc.JSON(http.StatusOK, resp.Result)
+}
+
+func (c *Controller) StatusTransaction(gc *gin.Context) {
+	var req model.RequestGetAllTransaction
+
+	//get request
+	if err := gc.BindJSON(&req); err != nil {
+		model.NewLinksError(gc, http.StatusBadRequest, "invalid req body")
+		return
+	}
+
+	//get all transactions info
+	answer, err := c.transaction.GetAllTransactions(gc, req)
+	if err != nil {
+		model.NewLinksError(gc, http.StatusInternalServerError, "CANCEL REQUEST, INTERNAL SERVER ERROR")
+		return
+	}
+
+	if answer == "" {
+		gc.JSON(http.StatusOK, "NO AVAILABLE TRANSACTIONS")
+	}
+
+	gc.JSON(http.StatusOK, answer)
 }
